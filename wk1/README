@@ -1,8 +1,6 @@
 # Week 1 Workflows
 
 
-Overall Structure
-1. Define the use case
-2. Impact 
-3. Features
-4. Architecture
+# WK1 / 04 
+Deploy a basic EC2 + Lambda + S3 setup employing CAID. 
+CAID - COST-AWARE INFRASTRUCTURE DESIGN
