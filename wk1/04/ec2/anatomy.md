@@ -1,0 +1,1 @@
+# The anatomy of the EC2 cost optimizer will be defined here
