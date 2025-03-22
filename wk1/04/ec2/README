@@ -32,7 +32,7 @@ The infrastructure uses Terraform to implement several cost-saving strategies in
 - Terraform v1.0.0 or later
 - AWS account with appropriate permissions
 - IAM user with programmatic access
-- AWS profile configured with name "tf-user"
+- AWS profile configured with user name or "default"
 
 ### Installation
 
@@ -117,25 +117,7 @@ aws scheduler list-schedules
 ## Data Flow
 The infrastructure implements a cost optimization workflow that monitors, manages, and adjusts EC2 resources based on usage patterns and defined thresholds.
 
-```ascii
-                                    +----------------+
-                                    |  EventBridge   |
-                                    |   Scheduler    |
-                                    +--------+-------+
-                                             |
-                                             v
-+----------------+    +--------------+    +--+----------+    +------------------+
-|   CloudWatch   |--->|              |    |            |    |  Auto Scaling    |
-|    Alarms      |    | EC2 Instance |<---| CloudWatch |<---|     Group        |
-+----------------+    |              |    |  Metrics   |    |                  |
-                     +--------------+    +------------+    +------------------+
-                           ^                                        ^
-                           |                                        |
-                     +----------------+                    +----------------+
-                     |    Compute    |                    |    Budget     |
-                     |   Optimizer   |                    |   Monitoring  |
-                     +----------------+                    +----------------+
-```
+![sgsdjsdsds](./docs/infra-ec2.svg)
 
 Key Component Interactions:
 1. EventBridge Scheduler manages instance start/stop schedule
@@ -148,10 +130,7 @@ Key Component Interactions:
 
 ## Infrastructure
 
-![Infrastructure diagram](./docs/infra.svg)
-
-### Lambda Functions
-- None defined
+![Infrastructure diagram](./docs/arch.svg)
 
 ### IAM Resources
 - Role: `ec2-optimizer-role` for EC2 instance management
