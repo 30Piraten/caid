@@ -117,7 +117,7 @@ aws scheduler list-schedules
 ## Data Flow
 The infrastructure implements a cost optimization workflow that monitors, manages, and adjusts EC2 resources based on usage patterns and defined thresholds.
 
-![sgsdjsdsds](./svg/infra-ec2.svg)
+![sgsdjsdsds](./svg/infra.svg)
 
 Key Component Interactions:
 1. EventBridge Scheduler manages instance start/stop schedule
