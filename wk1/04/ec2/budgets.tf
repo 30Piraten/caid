@@ -1,0 +1,20 @@
+# Cost monitoring with AWS Budgets
+resource "aws_budgets_budget" "ec2_cost" {
+  name = "ec2-monthly-budget"
+  budget_type = "COST"
+  limit_amount = "200"
+  limit_unit = "USD"
+  time_unit = "MONTHLY"
+
+  cost_filter {
+    name = "Service"
+    values = ["AmazonEC2"]
+  }
+
+  notification {
+    comparison_operator = "GREATER_THAN"
+    threshold = 80 
+    threshold_type = "PERCENTAGE"
+    notification_type = "ACTUAL"
+  }
+}
