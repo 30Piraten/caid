@@ -42,9 +42,46 @@ data "aws_ami" "machine_image" {
   }
 }
 
+# VPC definition
+resource "aws_vpc" "default" {
+  cidr_block = "10.0.0.0/16"
+  enable_dns_hostnames = true 
+  enable_dns_support = true 
+
+  tags = local.cost_tags
+}
+
+resource "aws_subnet" "selected_subnet" {
+  vpc_id = aws_vpc.default.id  
+  cidr_block = "10.0.1.0/24"
+  map_public_ip_on_launch = true 
+  availability_zone = "us-east-1b"
+
+  tags = local.cost_tags
+}
+
+resource "aws_internet_gateway" "net" {
+  vpc_id = aws_vpc.default.id 
+
+  tags = local.cost_tags
+}
+
+resource "aws_route_table" "route_table" {
+  vpc_id = aws_vpc.default.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.net.id 
+  }
+
+  tags = local.cost_tags
+}
+
+
 # EC2 spot instance definition
 resource "aws_instance" "server" {
   ami = data.aws_ami.machine_image.id
+  subnet_id = aws_subnet.selected_subnet.id
   instance_market_options {
     market_type = var.market_type
     spot_options {
@@ -54,13 +91,7 @@ resource "aws_instance" "server" {
 
   instance_type = var.instance_type
 
-  tags = {
-    Name         = local.cost_tags.Name
-    Environment  = local.cost_tags.Environment
-    AutoSchedule = local.cost_tags.AutoSchedule
-    Project      = local.cost_tags.Project
-    CostCenter   = local.cost_tags.CostCenter
-  }
+  tags = local.cost_tags
 }
 
 
@@ -68,12 +99,12 @@ resource "aws_instance" "server" {
 resource "aws_launch_template" "template" {
   name_prefix   = var.name_prefix
   image_id      = data.aws_ami.machine_image.id
-  instance_type = var.instance_type
+  # instance_type = var.instance_type
 
   instance_requirements {
     memory_mib {
       min = 1024
-      max = 4096
+      max = 2085
     }
     vcpu_count {
       min = 1
@@ -82,4 +113,6 @@ resource "aws_launch_template" "template" {
     instance_generations = ["current"]
     burstable_performance = "included"
   }
+
+  tags = local.cost_tags
 }
