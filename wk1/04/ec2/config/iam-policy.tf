@@ -27,7 +27,7 @@ resource "aws_iam_role" "ec2_instance_role" {
       }
     }]
   })
-  permissions_boundary = var.permissions_boundary_arn
+  # permissions_boundary = var.permissions_boundary_arn
 
   tags = {
     Name        = local.cost_tags.Name
