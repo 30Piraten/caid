@@ -16,8 +16,8 @@ resource "aws_computeoptimizer_recommendation_preferences" "ec2_preference" {
   
   # Define the scope to target a specific EC2 instance
   scope {
-    name  = data.aws_caller_identity.account.account_id
-    value = aws_instance.server.id
+    name  = "ResourceArn"
+    value = aws_instance.server.arn
   }
 
   # Enable enhanced metrics collection for better recommendations
