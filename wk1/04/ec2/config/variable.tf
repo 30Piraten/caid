@@ -16,7 +16,7 @@ variable "permissions_boundary_arn" {
 # INSTANCE CONFIG
 variable "instance_type" {
   type = string 
-  default = "t4g.micro"
+  default = "t4g.small"
 }
 
 variable "name_prefix" {
