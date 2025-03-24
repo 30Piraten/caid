@@ -54,7 +54,7 @@ resource "aws_autoscaling_schedule" "scaling_down_night" {
   max_size = 2
   desired_capacity = 1
   recurrence = "0 0 * * *"
-  autoscaling_group_name = aws_autoscaling_group.ec2_asg
+  autoscaling_group_name = aws_autoscaling_group.ec2_asg.name
 }
 
 # Scales up to 1-3 instances at 8am (08:00)
@@ -72,9 +72,11 @@ resource "aws_autoscaling_schedule" "scaling_up_morning" {
 # Enables automatic rebalancing of Spot Instances
 resource "aws_autoscaling_group" "ec2_asg" {
   capacity_rebalance = true  
+  # availability_zones = [ "us-east-1b" ]
+  vpc_zone_identifier = [ aws_subnet.selected_subnet.id ]
   # desired_capacity   = 3 # starting point
   max_size = 5  
-  min_size = 1 
+  min_size = 1
 
   health_check_grace_period = 300  
   force_delete              = true 
@@ -85,7 +87,7 @@ resource "aws_autoscaling_group" "ec2_asg" {
       on_demand_base_capacity                  = 0    
       on_demand_percentage_above_base_capacity = 25   
       spot_allocation_strategy                 = "capacity-optimized" 
-      spot_instance_pools                      = 3    
+      # spot_instance_pools                      = 3    
       on_demand_allocation_strategy            = "prioritized"
       spot_max_price                          = "0.0031" 
     }
