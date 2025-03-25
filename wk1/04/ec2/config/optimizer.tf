@@ -1,6 +1,6 @@
 /*
-Right sizing enhancements:
-- utilize AWS compute optimizer recommedations
+Right-sizing enhancements:
+- utilize AWS compute optimizer recommendations
   This refers to using AWS Compute Optimizer service which analyzes instance metrics 
   and provides recommendations for optimal instance types based on workload patterns
 */
