@@ -20,7 +20,7 @@ func TestEC2Instance(t *testing.T) {
 	defer terraform.Destroy(t, terraformOptions)
 
 	// terraform.InitAndApplyE(t, terraformOptions)
-	terraform.InitE(t, terraformOptions)
+	// terraform.InitE(t, terraformOptions)
 	terraform.ApplyAndIdempotentE(t, terraformOptions)
 
 	instanceID := terraform.Output(t, terraformOptions, "instance_id")
