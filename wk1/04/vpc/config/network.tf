@@ -91,6 +91,7 @@ resource "aws_route_table" "public" {
   route {
     cidr_block = "0.0.0.0/0" # Route all internet traffic through IGW
     gateway_id = aws_internet_gateway.gateway.id
+    nat_gateway_id = aws_nat_gateway.nat[keys(local.public_subnets)[0]].id
   }
   tags = merge(local.cost_tags, {
     Name = "${var.project_name}-public-rt"
@@ -123,8 +124,9 @@ resource "aws_eip" "ip" {
 }
 
 resource "aws_nat_gateway" "nat" {
-  allocation_id = aws_eip.ip.id
-  subnet_id     = values(aws_subnet.public)[0].id
+  for_each = local.public_subnets
+  allocation_id = aws_eip.ip[each.key].id 
+  subnet_id     = each.value.id 
 
   tags = merge(local.cost_tags, {
     Name = "${var.project_name}-nat-gw"
@@ -139,6 +141,19 @@ resource "aws_security_group" "endpoint_security" {
 
   tags = merge(local.cost_tags, {
     Name = "${var.project_name}-sg"
+  })
+}
+
+# Allow all outbound traffic within VPC CIDR range
+resource "aws_vpc_security_group_egress_rule" "endpoint_security" {
+  security_group_id = aws_security_group.endpoint_security.id
+  from_port = 0
+  to_port = 0 
+  ip_protocol = "-1"
+  cidr_ipv4 = var.vpc_cidr
+
+  tags = merge(local.cost_tags, {
+    Name = "${var.project_name}-egress-rule"
   })
 }
 
