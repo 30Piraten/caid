@@ -19,6 +19,7 @@ locals {
   public_subnets = {
     for index, az in var.availability_zones : az => cidrsubnet(var.vpc_cidr, local.subnet_newbits, index + length(var.availability_zones))
   }
+  primary_az = local.availability_zones[0]
 }
 
 # Data source to get current AWS region name
@@ -91,7 +92,7 @@ resource "aws_route_table" "public" {
   route {
     cidr_block = "0.0.0.0/0" # Route all internet traffic through IGW
     gateway_id = aws_internet_gateway.gateway.id
-    nat_gateway_id = aws_nat_gateway.nat[keys(local.public_subnets)[0]].id
+    nat_gateway_id = aws_nat_gateway.nat.id 
   }
   tags = merge(local.cost_tags, {
     Name = "${var.project_name}-public-rt"
@@ -124,9 +125,8 @@ resource "aws_eip" "ip" {
 }
 
 resource "aws_nat_gateway" "nat" {
-  for_each = local.public_subnets
-  allocation_id = aws_eip.ip[each.key].id 
-  subnet_id     = each.value.id 
+  allocation_id = aws_eip.ip.id 
+  subnet_id     = aws_subnet.public[local.primary_az].id
 
   tags = merge(local.cost_tags, {
     Name = "${var.project_name}-nat-gw"
