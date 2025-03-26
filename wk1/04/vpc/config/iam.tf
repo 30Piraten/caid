@@ -35,9 +35,9 @@ resource "aws_iam_role_policy" "nat_gateway_policy" {
           "ec2:AttachNetworkInterface"
         ]
         Resource = [
-   "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:vpc/${aws_vpc.network.id}",
-   "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:network-interface/*"
- ]      }
+          "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:vpc/${aws_vpc.network.id}",
+          "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:network-interface/*"
+      ] }
     ]
   })
 }
