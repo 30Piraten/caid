@@ -172,17 +172,16 @@ resource "aws_vpc_security_group_ingress_rule" "allow_tls_ipv4" {
 
 # S3 Gateway Endpoint for private subnet access to S3
 resource "aws_vpc_endpoint" "s3" {
-  for_each = local.private_subnets
+  for_each = aws_route_table.private
 
   vpc_id            = aws_vpc.network.id
   service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
   vpc_endpoint_type = "Gateway"
 
-  route_table_ids = concat(
-    [for rt in values(aws_route_table.private) : rt.id]
-  )
+  route_table_ids = [ each.value.id ]
+
   tags = merge(local.cost_tags, {
-    Name = "${var.project_name}-s3-endpoint"
+    Name = "${var.project_name}-s3-endpoint-${each.key}"
   })
 }
 
