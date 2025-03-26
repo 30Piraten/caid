@@ -1,0 +1,58 @@
+digraph INFRA {
+  node [ color = "black", fillcolor = "#E6E6E6", height =1, style = "filled,bold,rounded", fontname = "Arial" ];
+  "network" [ label = "network
+(aws_vpc)" ];
+  "gateway" [ label = "gateway
+(aws_internet_gateway)" ];
+  "private" [ label = "private
+(aws_route_table_association)" ];
+  "public" [ label = "public
+(aws_route_table_association)" ];
+  "ip" [ label = "ip
+(aws_eip)" ];
+  "nat" [ label = "nat
+(aws_nat_gateway)" ];
+  "endpoint_security" [ label = "endpoint_security
+(aws_security_group)" ];
+  "allow_tls_ipv4" [ label = "allow_tls_ipv4
+(aws_vpc_security_group_ingress_rule)" ];
+  "s3" [ label = "s3
+(aws_vpc_endpoint)" ];
+  "ecr_docker" [ label = "ecr_docker
+(aws_vpc_endpoint)" ];
+  "ecr_api" [ label = "ecr_api
+(aws_vpc_endpoint)" ];
+  "cloudwatch_logs" [ label = "cloudwatch_logs
+(aws_vpc_endpoint)" ];
+  "nat_gateway_role" [ label = "nat_gateway_role
+(aws_iam_role)", shape =rectangle ];
+  "nat_gateway_policy" [ label = "nat_gateway_policy
+(aws_iam_role_policy)", shape =rectangle ];
+  "gateway" -> "network";
+  "private" -> "network";
+  "public" -> "network";
+  "private" -> "network";
+  "public" -> "network";
+  "public" -> "gateway";
+  "private" -> "private";
+  "private" -> "private";
+  "public" -> "public";
+  "public" -> "public";
+  "nat" -> "ip";
+  "nat" -> "public";
+  "endpoint_security" -> "network";
+  "allow_tls_ipv4" -> "endpoint_security";
+  "s3" -> "network";
+  "s3" -> "private";
+  "ecr_docker" -> "network";
+  "ecr_docker" -> "private";
+  "ecr_docker" -> "endpoint_security";
+  "ecr_api" -> "network";
+  "ecr_api" -> "private";
+  "ecr_api" -> "endpoint_security";
+  "cloudwatch_logs" -> "network";
+  "cloudwatch_logs" -> "private";
+  "cloudwatch_logs" -> "endpoint_security";
+  "nat_gateway_policy" -> "nat_gateway_role";
+  "nat_gateway_policy" -> "network";
+}
