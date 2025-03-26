@@ -19,7 +19,7 @@ locals {
   public_subnets = {
     for index, az in var.availability_zones : az => cidrsubnet(var.vpc_cidr, local.subnet_newbits, index + length(var.availability_zones))
   }
-  primary_az = local.availability_zones[0]
+  primary_az = var.availability_zones[0]
 }
 
 # Data source to get current AWS region name
@@ -147,8 +147,8 @@ resource "aws_security_group" "endpoint_security" {
 # Allow all outbound traffic within VPC CIDR range
 resource "aws_vpc_security_group_egress_rule" "endpoint_security" {
   security_group_id = aws_security_group.endpoint_security.id
-  from_port = 0
-  to_port = 0 
+  from_port = 80
+  to_port = 80
   ip_protocol = "-1"
   cidr_ipv4 = var.vpc_cidr
 
