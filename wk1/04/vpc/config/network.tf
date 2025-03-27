@@ -73,29 +73,37 @@ resource "aws_subnet" "public" {
   })
 }
 
-# Create route tables for private subnets (one per AZ)
+# Create single route table for all public subnets
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.network.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.gateway.id
+  }
+
+  tags = merge(local.cost_tags, {
+    Name             = "${var.project_name}-public-rt"
+  })
+}
+
+# Create private route tables for each AZ, 
+# routing internet-bound traffic through NAT gateways
+# Note: Each private subnet gets its own route 
+# table to enable AZ-independent routing
 resource "aws_route_table" "private" {
   for_each = local.private_subnets
 
   vpc_id = aws_vpc.network.id
 
-  # Local route is automatically added by AWS
-  tags = merge(local.cost_tags, {
-    Name             = "${var.project_name}-private-rt-${each.key}"
-    AvailabilityZone = each.key
-  })
-}
-
-# Create single route table for all public subnets
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.network.id
   route {
-    cidr_block = "0.0.0.0/0" # Route all internet traffic through IGW
-    gateway_id = aws_internet_gateway.gateway.id
-    nat_gateway_id = aws_nat_gateway.nat.id 
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat[each.key].id
   }
+
   tags = merge(local.cost_tags, {
-    Name = "${var.project_name}-public-rt"
+    Name = "${var.project_name}-private-rt-${each.key}"
+    AvailabilityZone = each.key
   })
 }
 
@@ -115,21 +123,27 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-# NAT Gateway (for private subnet internet access)
+
+# Elastic IP for NAT Gateway
 resource "aws_eip" "ip" {
+  for_each = local.public_subnets
+
   domain = "vpc"
 
   tags = merge(local.cost_tags, {
-    Name = "${var.project_name}-nat-eip"
+    Name = "${var.project_name}-nat-eip-${each.key}"
   })
 }
 
+# NAT Gateway (for private subnet internet access)
 resource "aws_nat_gateway" "nat" {
-  allocation_id = aws_eip.ip.id 
-  subnet_id     = aws_subnet.public[local.primary_az].id
+  for_each = local.public_subnets
+
+  allocation_id = aws_eip.ip[each.key].id
+  subnet_id     = aws_subnet.public[each.key].id
 
   tags = merge(local.cost_tags, {
-    Name = "${var.project_name}-nat-gw"
+    Name = "${var.project_name}-nat-gw-${each.key}"
   })
 }
 
